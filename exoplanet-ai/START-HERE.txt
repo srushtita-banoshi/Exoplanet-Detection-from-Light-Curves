@@ -1,0 +1,96 @@
+================================================================================
+  EXOPLANET AI — STEP BY STEP (FOR BEGINNERS)
+================================================================================
+
+Do these steps IN ORDER. Don't skip any.
+
+--------------------------------------------------------------------------------
+STEP 1: Open the folder
+--------------------------------------------------------------------------------
+
+1. Press the Windows key on your keyboard (the key with the Windows logo).
+2. Type: File Explorer
+3. Press Enter. A window will open.
+4. On the left side, click "Desktop".
+5. Double-click the folder "ambedkar clg" (or wherever you saved the project).
+6. Double-click the folder "exoplanet-ai".
+7. You should now see folders named "backend" and "frontend", and files like 
+   FIRST-TIME-SETUP.bat and RUN-EVERYTHING.bat.
+
+--------------------------------------------------------------------------------
+STEP 2: First time only — Run the setup
+--------------------------------------------------------------------------------
+
+1. Stay in the exoplanet-ai folder.
+2. Find the file "FIRST-TIME-SETUP.bat".
+3. Double-click it.
+4. A black window will open. Wait. Text will scroll. This is normal.
+5. Wait until you see "Backend setup done" and "Frontend setup done".
+6. When it says "Press any key to continue", press any key.
+7. The window will close.
+
+   IF YOU SEE "Python not found":
+   - Go to https://www.python.org/downloads/
+   - Download Python and install it
+   - When installing, CHECK the box "Add python.exe to PATH"
+   - Then run FIRST-TIME-SETUP.bat again
+
+   IF YOU SEE "Node not found":
+   - Go to https://nodejs.org/
+   - Download the LTS version and install it
+   - Then run FIRST-TIME-SETUP.bat again
+
+   You only do STEP 2 ONCE. Next time skip to STEP 3.
+
+--------------------------------------------------------------------------------
+STEP 3: Run the app
+--------------------------------------------------------------------------------
+
+1. Stay in the exoplanet-ai folder.
+2. Find the file "RUN-EVERYTHING.bat".
+3. Double-click it.
+4. TWO black windows will open. DO NOT CLOSE THEM.
+   - One says "Backend (port 8000)"
+   - One says "Frontend (port 3000)"
+5. Wait 15–20 seconds. Text will scroll in both windows.
+6. When the Frontend window shows "Ready on http://localhost:3000", 
+   you are ready.
+
+--------------------------------------------------------------------------------
+STEP 4: Open the website
+--------------------------------------------------------------------------------
+
+1. Open your web browser (Chrome, Edge, or Firefox).
+2. Click the address bar at the top (where you type website names).
+3. Type exactly:  localhost:3000
+4. Press Enter.
+5. You should see the Exoplanet AI website (dark page with "AI-Powered Exoplanet").
+
+   IF THE PAGE IS BLANK:
+   - Wait 5 more seconds and press F5 to refresh
+   - Or try:  http://localhost:3000  (with http:// in front)
+
+--------------------------------------------------------------------------------
+STEP 5: Use the website
+--------------------------------------------------------------------------------
+
+- Click "Dashboard" to see planets. Click any planet for details.
+- Click "Light Curve Analyzer" to upload a file and run detection.
+- Click "About" to read about the project.
+
+--------------------------------------------------------------------------------
+STEP 6: When you are done
+--------------------------------------------------------------------------------
+
+- Close the browser when you want.
+- To stop the app: close the TWO black windows (Backend and Frontend).
+
+--------------------------------------------------------------------------------
+QUICK REMINDER
+--------------------------------------------------------------------------------
+
+First time:  Double-click FIRST-TIME-SETUP.bat, wait for it to finish.
+Every time:  Double-click RUN-EVERYTHING.bat, keep both windows open, 
+             then open browser and go to localhost:3000
+
+================================================================================

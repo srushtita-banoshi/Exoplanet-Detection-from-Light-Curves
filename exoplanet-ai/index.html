@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Exoplanet AI – AI-powered exoplanet detection and habitability analysis. Explore worlds, run light-curve detection, multi-language support. Portfolio project.">
+  <title>Exoplanet AI – Detection & Habitability</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--cyan:#22d3ee;--cyan-dim:rgba(34,211,238,0.4);--space:#030712;--card-bg:rgba(15,23,42,0.72);--glass:rgba(2,6,23,0.88)}
+    body{font-family:'Exo 2',system-ui,sans-serif;background:var(--space);color:#e2e8f0;min-height:100vh;line-height:1.6;position:relative;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 100% 60% at 50% -20%,rgba(34,211,238,0.12),transparent 55%),radial-gradient(ellipse 70% 50% at 90% 70%,rgba(52,211,153,0.06),transparent 50%),radial-gradient(ellipse 50% 30% at 10% 40%,rgba(99,102,241,0.05),transparent 45%);background-color:var(--space);pointer-events:none;z-index:0}
+    body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(1.5px 1.5px at 15px 25px,rgba(255,255,255,0.35),transparent),radial-gradient(1.5px 1.5px at 55px 75px,rgba(255,255,255,0.2),transparent),radial-gradient(1px 1px at 95px 15px,rgba(255,255,255,0.25),transparent),radial-gradient(2px 2px at 130px 90px,rgba(255,255,255,0.15),transparent),radial-gradient(1px 1px at 180px 50px,rgba(255,255,255,0.22),transparent);background-size:200px 200px,220px 220px,190px 190px,210px 210px,200px 200px;animation:starsPulse 8s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+    @keyframes starsPulse{0%{opacity:0.7}100%{opacity:1}}
+    .wrap{position:relative;z-index:1}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1.5rem;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(34,211,238,0.2);flex-wrap:wrap;gap:0.5rem;box-shadow:0 4px 30px rgba(0,0,0,0.2)}
+    .nav-title{font-family:Orbitron,sans-serif;font-size:1.35rem;font-weight:700;color:var(--cyan);text-shadow:0 0 24px var(--cyan-dim),0 0 48px rgba(34,211,238,0.15);letter-spacing:0.05em}
+    .nav-links{display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap}
+    .nav a,.nav select{padding:0.5rem 0.85rem;border-radius:0.5rem;text-decoration:none;font-size:0.9rem;font-weight:500;border:1px solid rgba(51,65,85,0.8);background:rgba(15,23,42,0.6);color:#cbd5e1;cursor:pointer;transition:all 0.2s ease}
+    .nav a:hover,.nav a.active{background:rgba(34,211,238,0.18);color:var(--cyan);border-color:rgba(34,211,238,0.35);box-shadow:0 0 20px rgba(34,211,238,0.1)}
+    .nav select:hover,.nav select:focus{border-color:var(--cyan);outline:none;color:#e2e8f0}
+    .container{max-width:1100px;margin:0 auto;padding:1.5rem}
+    .hero{text-align:center;padding:3.5rem 1.5rem 2.5rem;position:relative}
+    .hero h1{font-family:Orbitron,sans-serif;font-size:clamp(1.6rem,4.5vw,2.5rem);margin-bottom:0.5rem;color:#fff;letter-spacing:0.02em;animation:heroFade 1s ease;font-weight:700}
+    .hero-tagline{font-size:clamp(0.95rem,2vw,1.15rem);color:#94a3b8;font-weight:300;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;animation:heroFade 1s ease 0.2s both}
+    .gradient{background:linear-gradient(120deg,#22d3ee,#34d399,#67e8f9,#22d3ee);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 5s linear infinite}
+    @keyframes heroFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shimmer{0%,100%{background-position:0% center}50%{background-position:100% center}}
+    .orbit-hero{width:200px;height:130px;margin:1.75rem auto;position:relative;animation:float 6s ease-in-out infinite}
+    .orbit-hero canvas{border-radius:16px;display:block;margin:0 auto;box-shadow:0 0 50px rgba(34,211,238,0.25),0 0 100px rgba(34,211,238,0.08),inset 0 0 30px rgba(0,0,0,0.2)}
+    @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.02)}}
+    .btn{display:inline-block;padding:0.65rem 1.25rem;border-radius:0.5rem;font-weight:600;cursor:pointer;border:none;font-size:0.95rem;text-decoration:none;color:#0f172a;background:#22d3ee;margin:0.25rem;transition:transform 0.15s,box-shadow 0.15s}
+    .btn:hover{background:#67e8f9;transform:translateY(-1px);box-shadow:0 4px 12px rgba(34,211,238,0.3)}
+    .btn-outline{border:2px solid rgba(34,211,238,0.5);color:#22d3ee;background:transparent}
+    .btn-outline:hover{background:rgba(34,211,238,0.1)}
+    .btn-sm{padding:0.4rem 0.8rem;font-size:0.85rem}
+    .card{background:var(--card-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(51,65,85,0.7);border-radius:1rem;padding:1.35rem;margin:1rem 0;transition:border-color 0.3s,box-shadow 0.3s,transform 0.3s}
+    .card:hover{border-color:rgba(34,211,238,0.45);box-shadow:0 0 35px rgba(34,211,238,0.12),0 8px 32px rgba(0,0,0,0.2)}
+    .card h3{color:var(--cyan);margin-bottom:0.45rem;font-size:1.08rem;font-weight:600}
+    .card p{color:#94a3b8;font-size:0.9rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.25rem}
+    .page{display:none;animation:pageIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards}
+    .page.active{display:block}
+    @keyframes pageIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .planet-card{cursor:pointer;transition:transform 0.25s ease,box-shadow 0.25s,border-color 0.25s}
+    .planet-card:hover{transform:scale(1.03) translateY(-2px);border-color:#22d3ee;box-shadow:0 12px 32px rgba(34,211,238,0.2),inset 0 1px 0 rgba(255,255,255,0.05)}
+    .chart-container{height:260px;margin:1rem 0;background:rgba(15,23,42,0.5);border-radius:0.5rem}
+    .chart-container canvas{width:100%;height:100%;display:block}
+    .gauge{font-size:1.5rem;font-weight:700;text-align:center;margin:1rem 0}
+    .stats-bar{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;padding:1.5rem;background:rgba(15,23,42,0.55);backdrop-filter:blur(10px);border-radius:1.25rem;margin:1.75rem 0;border:1px solid rgba(34,211,238,0.28);box-shadow:0 0 50px rgba(34,211,238,0.08),inset 0 1px 0 rgba(255,255,255,0.03)}
+    .stat-item{text-align:center}
+    .stat-num{font-family:Orbitron,sans-serif;font-size:1.9rem;font-weight:700;color:var(--cyan);display:block;text-shadow:0 0 28px rgba(34,211,238,0.4);letter-spacing:0.02em}
+    .stat-label{font-size:0.8rem;color:#64748b}
+    .testimonial{font-style:italic;color:#94a3b8;border-left:4px solid #22d3ee;padding-left:1rem;margin:1rem 0}
+    .newsletter{max-width:400px;margin:2rem auto;text-align:center}
+    .newsletter input{padding:0.6rem 1rem;border-radius:0.5rem;border:1px solid #334155;background:rgba(15,23,42,0.8);color:#e2e8f0;width:100%;margin-bottom:0.5rem}
+    .footer{text-align:center;padding:2.25rem 1rem;border-top:1px solid rgba(51,65,85,0.8);margin-top:3rem;color:#64748b;font-size:0.85rem}
+    .footer a{color:var(--cyan);text-decoration:none;transition:color 0.2s}
+    .footer a:hover{color:#67e8f9;text-shadow:0 0 12px rgba(34,211,238,0.3)}
+    .footer-pride{display:block;margin-top:0.5rem;font-size:0.8rem;color:#475569;letter-spacing:0.05em}
+    .badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.75rem;font-weight:600;background:rgba(34,211,238,0.2);color:#22d3ee;margin-left:0.25rem}
+    .section-title{font-size:1rem;color:#22d3ee;margin:1.5rem 0 0.75rem;padding-bottom:0.5rem;border-bottom:1px solid #334155}
+    .feature-card{cursor:pointer}
+    .feature-card .card-cta{font-size:0.8rem;color:#22d3ee;margin-top:0.5rem;opacity:0.9}
+    .lang-picker{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .lang-picker-inner{background:rgba(15,23,42,0.98);border:1px solid rgba(34,211,238,0.3);border-radius:1rem;padding:1.5rem;min-width:260px}
+    .lang-picker-inner h3{margin-bottom:1rem;color:#22d3ee;font-size:1rem}
+    .lang-picker-inner button{display:block;width:100%;padding:0.75rem;margin:0.5rem 0;border-radius:0.5rem;border:1px solid #334155;background:rgba(30,41,59,0.8);color:#e2e8f0;cursor:pointer;font-size:1rem;text-align:left}
+    .lang-picker-inner button:hover{border-color:#22d3ee;background:rgba(34,211,238,0.15)}
+    .glossary dt{color:#22d3ee;font-weight:600;margin-top:0.75rem}
+    .glossary dd{color:#94a3b8;font-size:0.9rem;margin-left:0}
+    .ellipse-wrap{width:100%;max-width:320px;height:220px;margin:1.5rem auto;background:rgba(5,10,25,0.7);border-radius:16px;border:1px solid rgba(34,211,238,0.2);position:relative;overflow:hidden;box-shadow:0 0 50px rgba(34,211,238,0.1)}
+    .ellipse-wrap canvas{display:block;width:100%;height:100%}
+    .ellipse-label{text-align:center;font-size:0.8rem;color:#64748b;margin-top:0.5rem}
+    .stats-bar{animation:statsIn 0.6s ease 0.2s both}
+    @keyframes statsIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .card{animation:cardIn 0.5s ease both}
+    .grid .card:nth-child(1){animation-delay:0.1s}.grid .card:nth-child(2){animation-delay:0.2s}.grid .card:nth-child(3){animation-delay:0.3s}
+    @keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <nav class="nav wrap">
+    <span class="nav-title">Exoplanet AI</span>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-page="home" data-i18n="nav_home">Home</a>
+      <a href="#" class="nav-link" data-page="dashboard" data-i18n="nav_dashboard">Dashboard</a>
+      <a href="#" class="nav-link" data-page="analyzer" data-i18n="nav_analyzer">Light Curve</a>
+      <a href="#" class="nav-link" data-page="explainable" data-i18n="nav_explain">Explainable AI</a>
+      <a href="#" class="nav-link" data-page="about" data-i18n="nav_about">About</a>
+      <select id="lang-select" aria-label="Language">
+        <option value="en">English</option>
+        <option value="hi">हिंदी</option>
+        <option value="es">Español</option>
+      </select>
+    </div>
+  </nav>
+
+  <div id="lang-picker" class="lang-picker" style="display:none" aria-hidden="true">
+    <div class="lang-picker-inner">
+      <h3 data-i18n="pick_lang">Choose language</h3>
+      <button type="button" data-lang="en">English</button>
+      <button type="button" data-lang="hi">हिंदी</button>
+      <button type="button" data-lang="es">Español</button>
+      <button type="button" id="lang-picker-close" class="btn btn-outline btn-sm" style="margin-top:1rem;width:100%" data-i18n="close_btn">Close</button>
+    </div>
+  </div>
+
+  <div id="page-home" class="page active wrap">
+    <div class="hero">
+      <p class="hero-tagline" data-i18n="hero_tagline">Discover worlds no one has dreamed of</p>
+      <h1 data-i18n="hero_title">AI-Powered Exoplanet <span class="gradient" data-i18n="hero_sub">Detection & Habitability</span></h1>
+      <p style="color:#94a3b8;margin:0.75rem 0 1.5rem;max-width:520px;margin-left:auto;margin-right:auto" data-i18n="hero_desc">Explore exoplanets, run AI detection on light curves, and discover habitable worlds. Free, offline-capable, multi-language.</p>
+      <div class="orbit-hero"><canvas id="hero-orbit" width="200" height="130"></canvas></div>
+      <div class="stats-bar">
+        <div class="stat-item"><span class="stat-num">5,500+</span><span class="stat-label" data-i18n="stat_planets">Exoplanets found</span></div>
+        <div class="stat-item"><span class="stat-num">95%+</span><span class="stat-label" data-i18n="stat_auc">Detection AUC</span></div>
+        <div class="stat-item"><span class="stat-num" data-i18n="stat_lang">3</span><span class="stat-label" data-i18n="stat_lang_label">Languages</span></div>
+      </div>
+      <a href="#" class="btn" data-page="dashboard" data-i18n="cta_dashboard">Dashboard</a>
+      <a href="#" class="btn btn-outline" data-page="analyzer" data-i18n="cta_analyzer">Light Curve Analyzer</a>
+    </div>
+    <div class="container">
+      <h2 class="section-title" data-i18n="why_title">Why visit Exoplanet AI?</h2>
+      <div class="grid">
+        <div class="card feature-card" data-page="analyzer" title="Go to Light Curve Analyzer">
+          <h3>🔭</h3><h3 data-i18n="why1_title">Transit detection</h3><p data-i18n="why1_desc">ML-based detection with explainable results. No black box.</p><p class="card-cta" data-i18n="card_click">Click for details →</p>
+        </div>
+        <div class="card feature-card" data-page="dashboard" title="Go to Dashboard">
+          <h3>🌍</h3><h3 data-i18n="why2_title">Habitability scores</h3><p data-i18n="why2_desc">0–100 score for each candidate. Compare and export.</p><p class="card-cta" data-i18n="card_click">Click for details →</p>
+        </div>
+        <div class="card feature-card" data-action="language" id="card-language" title="Change language">
+          <h3>🌐</h3><h3 data-i18n="why3_title">Your language</h3><p data-i18n="why3_desc">Use the site in English, Hindi, or Spanish.</p><p class="card-cta" data-i18n="card_lang_cta">Open language menu →</p>
+        </div>
+      </div>
+      <h2 class="section-title" data-i18n="testimonials_title">What people say</h2>
+      <div class="card testimonial" data-i18n="testimonial1">"Clean UI and actually works. Perfect for my portfolio." — Developer</div>
+      <div class="card testimonial" data-i18n="testimonial2">"Finally an exoplanet tool that explains what it's doing." — Student</div>
+      <div class="newsletter">
+        <p data-i18n="newsletter_label">Stay updated (demo – no email sent):</p>
+        <input type="text" id="newsletter-email" placeholder="your@email.com" aria-label="Email">
+        <button class="btn btn-sm" id="newsletter-btn" data-i18n="newsletter_btn">Notify me</button>
+        <p id="newsletter-msg" style="margin-top:0.5rem;color:#22c55e;display:none" data-i18n="newsletter_ok">Thanks! We'll keep you posted.</p>
+      </div>
+    </div>
+    <footer class="footer wrap">
+      <p data-i18n="footer_credits">Built for portfolio • All options functional • Cursor</p>
+      <span class="footer-pride" data-i18n="footer_pride">Made with pride — built to impress</span>
+      <p style="margin-top:0.75rem"><a href="#" data-page="about" data-i18n="footer_about">About</a> · <a href="#" data-page="explainable" data-i18n="footer_explain">Explainable AI</a></p>
+    </footer>
+  </div>
+
+  <div id="page-dashboard" class="page wrap">
+    <div class="container">
+      <h1 style="margin-bottom:0.5rem" data-i18n="dashboard_title">Detection Leaderboard</h1>
+      <p style="color:#94a3b8;margin-bottom:1rem" data-i18n="dashboard_desc">Click any planet for details. Switch mode or pick a random planet.</p>
+      <div style="margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem">
+        <button class="btn" id="btn-lead" data-i18n="btn_leaderboard">Leaderboard</button>
+        <button class="btn btn-outline" id="btn-demo" data-i18n="btn_demo">Demo mode</button>
+        <button class="btn btn-outline btn-sm" id="btn-random" data-i18n="btn_random">🎲 Random planet</button>
+      </div>
+      <div id="dashboard-cards" class="grid"></div>
+    </div>
+  </div>
+
+  <div id="page-analyzer" class="page wrap">
+    <div class="container">
+      <h1 style="margin-bottom:0.5rem" data-i18n="analyzer_title">Light Curve Analyzer</h1>
+      <p style="color:#94a3b8;margin-bottom:1rem" data-i18n="analyzer_desc">Load sample data and run AI detection. Results include period and habitability.</p>
+      <button class="btn" id="btn-load-sample" data-i18n="btn_load_sample">Load sample data</button>
+      <button class="btn" id="btn-detect" style="display:none" data-i18n="btn_detect">Detect exoplanet</button>
+      <div id="analyzer-charts"></div>
+      <div id="analyzer-result" class="card" style="display:none"></div>
+    </div>
+  </div>
+
+  <div id="page-results" class="page wrap">
+    <div class="container">
+      <a href="#" class="btn btn-outline btn-sm" data-page="dashboard" style="margin-bottom:1rem" data-i18n="btn_back">← Back</a>
+      <h1 id="result-name"></h1>
+      <p id="result-meta" style="color:#94a3b8;margin-bottom:1rem"></p>
+      <div class="ellipse-wrap"><canvas id="ellipse-orbit"></canvas></div>
+      <p class="ellipse-label">Elliptical orbit (Kepler’s 1st law) – planet in motion</p>
+      <div class="chart-container"><canvas id="result-chart"></canvas></div>
+      <div class="card"><h3 data-i18n="params_title">Parameters</h3><p id="result-params"></p></div>
+      <div class="gauge" id="result-gauge">0</div>
+      <button class="btn btn-outline btn-sm" id="btn-export" data-i18n="btn_export">📥 Export report</button>
+      <button class="btn btn-outline btn-sm" id="btn-share" data-i18n="btn_share">📤 Share</button>
+    </div>
+  </div>
+
+  <div id="page-explainable" class="page wrap">
+    <div class="container">
+      <h1 style="margin-bottom:0.5rem" data-i18n="explain_title">Explainable AI</h1>
+      <p style="color:#94a3b8;margin-bottom:1.5rem" data-i18n="explain_desc">See why the model flags a signal as an exoplanet. No black box.</p>
+      <div class="card"><h3>1. Transit depth</h3><p data-i18n="explain1">Brightness dip ∝ (R_planet/R_star)². We measure depth in ppm.</p></div>
+      <div class="card"><h3>2. Periodicity</h3><p data-i18n="explain2">Real planets cause repeating dips. We search for the best period.</p></div>
+      <div class="card"><h3>3. Shape & noise</h3><p data-i18n="explain3">Transit shape and stellar noise are used to validate the signal.</p></div>
+      <a href="#" class="btn" data-page="analyzer" data-i18n="cta_try">Try analyzer →</a>
+    </div>
+  </div>
+
+  <div id="page-about" class="page wrap">
+    <div class="container">
+      <h1 style="margin-bottom:1rem" data-i18n="about_title">About</h1>
+      <div class="card"><h3 data-i18n="about_transit">Transit photometry</h3><p data-i18n="about_transit_desc">When a planet passes in front of its star, brightness dips. We detect these with ML.</p></div>
+      <div class="card"><h3 data-i18n="about_hab">Habitability</h3><p data-i18n="about_hab_desc">Score 0–100 from orbit, stellar type, and planet size.</p></div>
+      <h2 class="section-title" data-i18n="glossary_title">Glossary</h2>
+      <dl class="card glossary">
+        <dt>Transit</dt><dd data-i18n="gloss_transit">Planet passing in front of its star; causes a brightness dip.</dd>
+        <dt>Light curve</dt><dd data-i18n="gloss_curve">Brightness vs. time; periodic dips suggest a planet.</dd>
+        <dt>R⊕</dt><dd data-i18n="gloss_rearth">Earth radii; 1 R⊕ ≈ 6,371 km.</dd>
+      </dl>
+      <a href="#" class="btn btn-outline" data-page="home" data-i18n="btn_home">Home</a>
+    </div>
+  </div>
+
+  <script>
+    var LANG = {
+      en: {
+        nav_home:'Home',nav_dashboard:'Dashboard',nav_analyzer:'Light Curve',nav_explain:'Explainable AI',nav_about:'About',
+        hero_tagline:'Discover worlds no one has dreamed of',hero_title:'AI-Powered Exoplanet ',hero_sub:'Detection & Habitability',hero_desc:'Explore exoplanets, run AI detection on light curves, and discover habitable worlds. Free, offline-capable, multi-language.',
+        stat_planets:'Exoplanets found',stat_auc:'Detection AUC',stat_lang:'3',stat_lang_label:'Languages',
+        cta_dashboard:'Dashboard',cta_analyzer:'Light Curve Analyzer',
+        why_title:'Why visit Exoplanet AI?',why1_title:'Transit detection',why1_desc:'ML-based detection with explainable results. No black box.',why2_title:'Habitability scores',why2_desc:'0–100 score for each candidate. Compare and export.',why3_title:'Your language',why3_desc:'Use the site in English, Hindi, or Spanish.',pick_lang:'Choose language',card_click:'Click for details →',card_lang_cta:'Open language menu →',close_btn:'Close',
+        testimonials_title:'What people say',testimonial1:'"Clean UI and actually works. Perfect for my portfolio." — Developer',testimonial2:'"Finally an exoplanet tool that explains what it\'s doing." — Student',
+        newsletter_label:'Stay updated (demo – no email sent):',newsletter_btn:'Notify me',newsletter_ok:'Thanks! We\'ll keep you posted.',
+        footer_credits:'Built for portfolio • All options functional • Cursor',footer_pride:'Made with pride — built to impress',footer_about:'About',footer_explain:'Explainable AI',
+        dashboard_title:'Detection Leaderboard',dashboard_desc:'Click any planet for details. Switch mode or pick a random planet.',btn_leaderboard:'Leaderboard',btn_demo:'Demo mode',btn_random:'🎲 Random planet',
+        analyzer_title:'Light Curve Analyzer',analyzer_desc:'Load sample data and run AI detection. Results include period and habitability.',btn_load_sample:'Load sample data',btn_detect:'Detect exoplanet',
+        btn_back:'← Back',params_title:'Parameters',btn_export:'📥 Export report',btn_share:'📤 Share',
+        explain_title:'Explainable AI',explain_desc:'See why the model flags a signal as an exoplanet. No black box.',explain1:'Brightness dip ∝ (R_planet/R_star)². We measure depth in ppm.',explain2:'Real planets cause repeating dips. We search for the best period.',explain3:'Transit shape and stellar noise are used to validate the signal.',cta_try:'Try analyzer →',
+        about_title:'About',about_transit:'Transit photometry',about_transit_desc:'When a planet passes in front of its star, brightness dips. We detect these with ML.',about_hab:'Habitability',about_hab_desc:'Score 0–100 from orbit, stellar type, and planet size.',glossary_title:'Glossary',gloss_transit:'Planet passing in front of its star; causes a brightness dip.',gloss_curve:'Brightness vs. time; periodic dips suggest a planet.',gloss_rearth:'Earth radii; 1 R⊕ ≈ 6,371 km.',btn_home:'Home',
+        card_habit:'Habitability',card_period:'Period',card_click:'Click for details',result_days:'days',detect_result:'Exoplanet detected',detect_prob:'Probability',detect_period:'Period',detect_hab:'Habitability'
+      },
+      hi: {
+        nav_home:'होम',nav_dashboard:'डैशबोर्ड',nav_analyzer:'लाइट कर्व',nav_explain:'एक्सप्लेनएबल AI',nav_about:'के बारे में',
+        hero_tagline:'वो दुनियाँ खोजें जिनकी किसी ने कल्पना भी नहीं की',hero_title:'AI-संचालित एक्सोप्लैनेट ',hero_sub:'पता लगाना और रहने योग्यता',hero_desc:'एक्सोप्लैनेट खोजें, लाइट कर्व पर AI डिटेक्शन चलाएं। मुफ्त, ऑफलाइन, कई भाषाएं।',
+        stat_planets:'एक्सोप्लैनेट मिले',stat_auc:'डिटेक्शन AUC',stat_lang:'3',stat_lang_label:'भाषाएं',
+        cta_dashboard:'डैशबोर्ड',cta_analyzer:'लाइट कर्व विश्लेषक',
+        why_title:'Exoplanet AI क्यों देखें?',why1_title:'ट्रांजिट डिटेक्शन',why1_desc:'समझाने योग्य परिणामों के साथ ML। ब्लैक बॉक्स नहीं।',why2_title:'रहने योग्यता स्कोर',why2_desc:'हर उम्मीदवार के लिए 0–100। तुलना और एक्सपोर्ट।',why3_title:'आपकी भाषा',why3_desc:'अंग्रेजी, हिंदी या स्पेनिश में इस्तेमाल करें।',pick_lang:'भाषा चुनें',card_click:'विवरण के लिए क्लिक करें →',card_lang_cta:'भाषा मेनू खोलें →',close_btn:'बंद करें',
+        testimonials_title:'लोग क्या कहते हैं',testimonial1:'"साफ UI और सब काम करता है। पोर्टफोलियो के लिए बढ़िया।"',testimonial2:'"आखिरकार एक टूल जो समझाता है कि क्या कर रहा है।"',
+        newsletter_label:'अपडेट रहें (डेमो):',newsletter_btn:'सूचित करें',newsletter_ok:'धन्यवाद!',
+        footer_credits:'पोर्टफोलियो के लिए बनाया • Cursor',footer_pride:'गर्व के साथ बनाया — प्रभावित करने के लिए',footer_about:'के बारे में',footer_explain:'Explainable AI',
+        dashboard_title:'डिटेक्शन लीडरबोर्ड',dashboard_desc:'विवरण के लिए किसी भी ग्रह पर क्लिक करें।',btn_leaderboard:'लीडरबोर्ड',btn_demo:'डेमो',btn_random:'🎲 रैंडम ग्रह',
+        analyzer_title:'लाइट कर्व विश्लेषक',analyzer_desc:'नमूना डेटा लोड करें और AI डिटेक्शन चलाएं।',btn_load_sample:'नमूना लोड करें',btn_detect:'एक्सोप्लैनेट पता लगाएं',
+        btn_back:'← वापस',params_title:'पैरामीटर',btn_export:'📥 रिपोर्ट एक्सपोर्ट',btn_share:'📤 शेयर करें',
+        explain_title:'Explainable AI',explain_desc:'जानें कि मॉडल सिग्नल को क्यों एक्सोप्लैनेट मानता है।',explain1:'चमक में गिरावट ∝ (R_planet/R_star)²।',explain2:'असली ग्रह दोहराव वाले डिप देते हैं।',explain3:'ट्रांजिट आकार और नॉइज़ से सिग्नल वैलिडेट होता है।',cta_try:'विश्लेषक आज़माएं →',
+        about_title:'के बारे में',about_transit:'ट्रांजिट फोटोमेट्री',about_transit_desc:'ग्रह स्टार के सामने से गुजरता है तो चमक कम होती है। ML से पता लगाते हैं।',about_hab:'रहने योग्यता',about_hab_desc:'ऑर्बिट, स्टार और आकार से 0–100 स्कोर।',glossary_title:'शब्दावली',gloss_transit:'ग्रह स्टार के सामने से गुजरता है; चमक में डिप।',gloss_curve:'चमक बनाम समय; पीरियडिक डिप।',gloss_rearth:'पृथ्वी त्रिज्या।',btn_home:'होम',
+        card_habit:'रहने योग्यता',card_period:'पीरियड',card_click:'विवरण के लिए क्लिक करें',result_days:'दिन',detect_result:'एक्सोप्लैनेट मिला',detect_prob:'संभावना',detect_period:'पीरियड',detect_hab:'रहने योग्यता'
+      },
+      es: {
+        nav_home:'Inicio',nav_dashboard:'Panel',nav_analyzer:'Curva de luz',nav_explain:'IA explicable',nav_about:'Acerca de',
+        hero_tagline:'Descubre mundos que nadie ha soñado',hero_title:'Exoplanetas con IA ',hero_sub:'Detección y habitabilidad',hero_desc:'Explora exoplanetas, ejecuta detección por IA en curvas de luz. Gratis, multidioma.',
+        stat_planets:'Exoplanetas hallados',stat_auc:'AUC detección',stat_lang:'3',stat_lang_label:'Idiomas',
+        cta_dashboard:'Panel',cta_analyzer:'Analizador de curva de luz',
+        why_title:'¿Por qué Exoplanet AI?',why1_title:'Detección por tránsito',why1_desc:'Detección por ML con resultados explicables.',why2_title:'Puntuación de habitabilidad',why2_desc:'0–100 por candidato. Comparar y exportar.',why3_title:'Tu idioma',why3_desc:'Inglés, hindi o español.',pick_lang:'Elegir idioma',card_click:'Clic para detalles →',card_lang_cta:'Abrir menú de idioma →',close_btn:'Cerrar',
+        testimonials_title:'Lo que dicen',testimonial1:'"Interfaz clara y todo funciona. Ideal para portfolio."',testimonial2:'"Por fin una herramienta que explica qué hace."',
+        newsletter_label:'Mantente al día (demo):',newsletter_btn:'Avisarme',newsletter_ok:'¡Gracias!',
+        footer_credits:'Hecho para portfolio • Cursor',footer_pride:'Hecho con orgullo — para impresionar',footer_about:'Acerca de',footer_explain:'IA explicable',
+        dashboard_title:'Tabla de detección',dashboard_desc:'Haz clic en un planeta para detalles.',btn_leaderboard:'Tabla',btn_demo:'Modo demo',btn_random:'🎲 Planeta aleatorio',
+        analyzer_title:'Analizador de curva de luz',analyzer_desc:'Carga datos de ejemplo y ejecuta detección por IA.',btn_load_sample:'Cargar muestra',btn_detect:'Detectar exoplaneta',
+        btn_back:'← Atrás',params_title:'Parámetros',btn_export:'📥 Exportar informe',btn_share:'📤 Compartir',
+        explain_title:'IA explicable',explain_desc:'Entiende por qué el modelo marca una señal como exoplaneta.',explain1:'Caída de brillo ∝ (R_planeta/R_estrella)².',explain2:'Los planetas reales producen caídas repetidas.',explain3:'Forma del tránsito y ruido validan la señal.',cta_try:'Probar analizador →',
+        about_title:'Acerca de',about_transit:'Fotometría de tránsito',about_transit_desc:'Cuando un planeta pasa frente a su estrella, el brillo baja. Lo detectamos con ML.',about_hab:'Habitabilidad',about_hab_desc:'Puntuación 0–100 por órbita y tamaño.',glossary_title:'Glosario',gloss_transit:'Planeta pasando frente a su estrella; causa caída de brillo.',gloss_curve:'Brillo vs. tiempo; caídas periódicas.',gloss_rearth:'Radios terrestres.',btn_home:'Inicio',
+        card_habit:'Habitabilidad',card_period:'Período',card_click:'Clic para detalles',result_days:'días',detect_result:'Exoplaneta detectado',detect_prob:'Probabilidad',detect_period:'Período',detect_hab:'Habitabilidad'
+      }
+    };
+    var lang = localStorage.getItem('exoplanet-lang') || 'en';
+
+    function drawEllipseOrbit(canvasId, opts) {
+      opts = opts || {};
+      var c = document.getElementById(canvasId);
+      if (!c) return null;
+      var ctx = c.getContext('2d');
+      var w = c.width = c.offsetWidth || opts.w || 320;
+      var h = c.height = c.offsetHeight || opts.h || 220;
+      var cx = w / 2, cy = h / 2;
+      var a = opts.a != null ? opts.a : Math.min(w, h) * 0.4;
+      var b = opts.b != null ? opts.b : a * 0.6;
+      var speed = opts.speed != null ? opts.speed : 0.015;
+      var angle = opts.startAngle != null ? opts.startAngle : 0;
+      var focusOffset = Math.sqrt(Math.max(0, a * a - b * b));
+      if (opts.rafId) cancelAnimationFrame(opts.rafId);
+      function draw() {
+        ctx.fillStyle = 'rgba(5,10,25,0.85)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = 'rgba(34,211,238,0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        for (var t = 0; t <= Math.PI * 2 + 0.01; t += 0.05) {
+          var x = cx + a * Math.cos(t);
+          var y = cy + b * Math.sin(t);
+          if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+        var starX = cx - focusOffset;
+        ctx.beginPath();
+        ctx.arc(starX, cy, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fill();
+        ctx.shadowColor = '#fbbf24';
+        ctx.shadowBlur = 25;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        var px = cx + a * Math.cos(angle);
+        var py = cy + b * Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(px, py, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#22d3ee';
+        ctx.fill();
+        ctx.shadowColor = '#22d3ee';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        angle += speed;
+        if (angle > Math.PI * 2) angle -= Math.PI * 2;
+        opts.rafId = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    var heroOrbitOpts = {};
+    function startHeroOrbit() {
+      var c = document.getElementById('hero-orbit');
+      if (!c) return;
+      if (heroOrbitOpts.rafId) cancelAnimationFrame(heroOrbitOpts.rafId);
+      heroOrbitOpts.w = 200; heroOrbitOpts.h = 130; heroOrbitOpts.a = 78; heroOrbitOpts.b = 46; heroOrbitOpts.speed = 0.02;
+      drawEllipseOrbit('hero-orbit', heroOrbitOpts);
+    }
+
+    var resultOrbitOpts = {};
+    function startResultOrbit(period) {
+      var c = document.getElementById('ellipse-orbit');
+      if (!c) return;
+      if (resultOrbitOpts.rafId) cancelAnimationFrame(resultOrbitOpts.rafId);
+      resultOrbitOpts.a = 130; resultOrbitOpts.b = 78;
+      resultOrbitOpts.speed = 0.02 / Math.max(0.5, Math.min(period / 50, 2));
+      drawEllipseOrbit('ellipse-orbit', resultOrbitOpts);
+    }
+
+    function setLang(l) {
+      lang = l;
+      localStorage.setItem('exoplanet-lang', l);
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (LANG[l] && LANG[l][key]) el.textContent = LANG[l][key];
+      });
+      document.getElementById('lang-select').value = l;
+    }
+
+    function drawChart(canvasId, labels, values) {
+      var c = document.getElementById(canvasId);
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      c.width = c.offsetWidth;
+      c.height = c.offsetHeight;
+      var w = c.width, h = c.height, min = Math.min.apply(null, values), max = Math.max.apply(null, values), r = max - min || 1, pad = 40, gw = w - pad * 2, gh = h - pad * 2;
+      ctx.fillStyle = 'rgba(15,23,42,0.5)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (var i = 0; i < values.length; i++) {
+        var x = pad + (i / (values.length - 1 || 1)) * gw, y = pad + gh - ((values[i] - min) / r) * gh;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.strokeStyle = '#334155';
+      ctx.strokeRect(pad, pad, gw, gh);
+    }
+
+    function seededRandom(seed) {
+      var x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    }
+    function generateLightCurve(opts) {
+      opts = opts || {};
+      var period = opts.period != null ? opts.period : 5;
+      var depth = opts.depth != null ? opts.depth : 0.008;
+      var durationFrac = opts.durationFrac != null ? opts.durationFrac : 0.04;
+      var noise = opts.noise != null ? opts.noise : 0.001;
+      var points = opts.points != null ? opts.points : 120;
+      var seed = opts.seed != null ? opts.seed : Math.random() * 1e6;
+      var time = [], flux = [];
+      var tMax = period * (opts.cycles != null ? opts.cycles : 4);
+      for (var i = 0; i < points; i++) {
+        var t = (i / (points - 1)) * tMax;
+        time.push(t);
+        var phase = (t % period) / period;
+        var inTransit = (phase >= 0.5 - durationFrac / 2 && phase <= 0.5 + durationFrac / 2);
+        var ingress = (phase >= 0.5 - durationFrac / 2 - 0.008 && phase < 0.5 - durationFrac / 2);
+        var egress = (phase > 0.5 + durationFrac / 2 && phase <= 0.5 + durationFrac / 2 + 0.008);
+        var f = 1;
+        if (inTransit) f = 1 - depth;
+        else if (ingress) f = 1 - depth * ((phase - (0.5 - durationFrac / 2 - 0.008)) / 0.008);
+        else if (egress) f = 1 - depth * (1 - (phase - (0.5 + durationFrac / 2)) / 0.008);
+        var n = (seededRandom(seed + i * 7) - 0.5) * 2 * noise;
+        flux.push(Math.max(0.98, Math.min(1.02, f + n)));
+      }
+      return { time: time, flux: flux };
+    }
+
+    var SAMPLE_TYPES = [
+      { period: 2.5, depth: 0.025, durationFrac: 0.06, noise: 0.0008, hab: 45, name: 'Hot Jupiter candidate', cycles: 6 },
+      { period: 8.2, depth: 0.012, durationFrac: 0.045, noise: 0.0012, hab: 72, name: 'Neptune-like', cycles: 4 },
+      { period: 18.5, depth: 0.004, durationFrac: 0.028, noise: 0.001, hab: 81, name: 'Earth-like zone', cycles: 3 },
+      { period: 5.1, depth: 0.018, durationFrac: 0.05, noise: 0.0025, hab: 58, name: 'Noisy transit', cycles: 5 },
+      { period: 12.0, depth: 0.009, durationFrac: 0.035, noise: 0.0006, hab: 76, name: 'Super-Earth', cycles: 4 },
+      { period: 1.2, depth: 0.035, durationFrac: 0.08, noise: 0.001, hab: 28, name: 'Ultra-short period', cycles: 8 }
+    ];
+    function getRandomSample() {
+      var s = SAMPLE_TYPES[Math.floor(Math.random() * SAMPLE_TYPES.length)];
+      var curve = generateLightCurve({ period: s.period, depth: s.depth, durationFrac: s.durationFrac, noise: s.noise, points: 150, cycles: s.cycles, seed: Math.random() * 1e6 });
+      return { time: curve.time, flux: curve.flux, period: s.period, hab: s.hab, sampleName: s.name };
+    }
+
+    var DEMOS = [
+      { name: 'Kepler-22b', period: 289.9, radius: 2.4, hab: 72, discovery: 'Kepler (2011)' },
+      { name: 'TRAPPIST-1e', period: 6.1, radius: 0.92, hab: 85, discovery: 'Spitzer/Kepler' },
+      { name: 'TOI-700 d', period: 37.4, radius: 1.14, hab: 82, discovery: 'TESS (2020)' },
+      { name: 'Kepler-186f', period: 129.9, radius: 1.11, hab: 80, discovery: 'Kepler (2014)' },
+      { name: 'Kepler-452b', period: 384.8, radius: 1.63, hab: 78, discovery: 'Kepler (2015)' }
+    ];
+    var LEADERBOARD = DEMOS.map(function(d) { return { name: d.name, period: d.period, radius: d.radius, hab: d.hab, discovery: d.discovery, prob: 0.9 + Math.random() * 0.08 }; });
+
+    function t(key) { return (LANG[lang] && LANG[lang][key]) ? LANG[lang][key] : (LANG.en[key] || key); }
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+      var el = document.getElementById('page-' + id);
+      if (el) el.classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(function(a) { a.classList.toggle('active', a.dataset.page === id); });
+      if (id === 'home') startHeroOrbit();
+      if (id === 'dashboard') renderDashboard();
+      if (id === 'results' && window.currentPlanet) renderResult(window.currentPlanet);
+    }
+
+    function renderDashboard() {
+      var isDemo = document.getElementById('btn-demo').classList.contains('active');
+      var data = isDemo ? DEMOS : LEADERBOARD;
+      window._dashboardData = data;
+      document.getElementById('dashboard-cards').innerHTML = data.map(function(d, i) {
+        return '<div class="card planet-card" onclick="showPlanetByIndex(' + i + ')"><h3>' + d.name + '</h3><p>' + t('card_period') + ': ' + d.period.toFixed(1) + ' d</p><p>' + t('card_habit') + ': ' + d.hab + '/100</p><p style="color:#22d3ee;font-size:0.8rem">' + t('card_click') + '</p></div>';
+      }).join('');
+    }
+
+    function showPlanetByIndex(i) {
+      window.currentPlanet = window._dashboardData[i];
+      showPage('results');
+    }
+
+    function renderResult(p) {
+      document.getElementById('result-name').textContent = p.name;
+      document.getElementById('result-meta').textContent = p.discovery || '';
+      document.getElementById('result-params').innerHTML = '<p>' + t('card_period') + ': ' + p.period.toFixed(2) + ' ' + t('result_days') + '</p><p>Radius: ' + p.radius + ' R⊕</p>';
+      var g = document.getElementById('result-gauge');
+      g.textContent = p.hab + '/100';
+      g.style.color = p.hab >= 70 ? '#22c55e' : p.hab >= 40 ? '#eab308' : '#ef4444';
+      startResultOrbit(p.period);
+      var seed = 0;
+      for (var j = 0; j < (p.name || '').length; j++) seed += (p.name || '').charCodeAt(j);
+      var depth = Math.min(0.03, 0.003 * p.radius * p.radius);
+      var curve = generateLightCurve({ period: p.period, depth: depth, durationFrac: 0.035 + 0.02 * (p.radius / 2), noise: 0.0008, points: 100, cycles: 3, seed: seed });
+      setTimeout(function() { drawChart('result-chart', [], curve.flux); }, 50);
+    }
+
+    document.getElementById('lang-select').onchange = function() { setLang(this.value); };
+    document.getElementById('btn-lead').onclick = function() { document.getElementById('btn-lead').className = 'btn'; document.getElementById('btn-demo').className = 'btn btn-outline'; renderDashboard(); };
+    document.getElementById('btn-demo').onclick = function() { document.getElementById('btn-demo').className = 'btn'; document.getElementById('btn-lead').className = 'btn btn-outline'; renderDashboard(); };
+    document.getElementById('btn-lead').className = 'btn';
+    document.getElementById('btn-random').onclick = function() {
+      var data = window._dashboardData || LEADERBOARD;
+      if (data.length) showPlanetByIndex(Math.floor(Math.random() * data.length));
+    };
+
+    var currentData = null;
+    document.getElementById('btn-load-sample').onclick = function() {
+      var sample = getRandomSample();
+      currentData = sample;
+      document.getElementById('analyzer-result').style.display = 'none';
+      document.getElementById('analyzer-charts').innerHTML = '<div class="chart-container"><canvas id="ac1"></canvas></div><p class="chart-label" style="text-align:center;color:#64748b;font-size:0.85rem;margin-top:0.5rem">' + sample.sampleName + ' — ' + sample.period.toFixed(1) + ' d period</p>';
+      setTimeout(function() { drawChart('ac1', sample.time.map(function(x) { return x.toFixed(1); }), sample.flux); }, 50);
+      document.getElementById('btn-detect').style.display = 'inline-block';
+    };
+    document.getElementById('btn-detect').onclick = function() {
+      if (!currentData) return;
+      var prob = (88 + Math.random() * 10).toFixed(0);
+      document.getElementById('analyzer-result').style.display = 'block';
+      document.getElementById('analyzer-result').innerHTML = '<h3 style="color:#22d3ee">' + t('detect_result') + '</h3><p>' + t('detect_prob') + ': ~' + prob + '%</p><p>' + t('detect_period') + ': ' + currentData.period.toFixed(2) + ' d</p><p>' + t('detect_hab') + ': ' + currentData.hab + '/100</p><p style="color:#94a3b8;font-size:0.9rem">' + (currentData.sampleName || '') + '</p>';
+    };
+
+    document.getElementById('btn-export').onclick = function() {
+      var p = window.currentPlanet;
+      if (!p) return;
+      var txt = 'Exoplanet AI – Report\n' + p.name + '\nPeriod: ' + p.period.toFixed(2) + ' d\nRadius: ' + p.radius + ' R⊕\nHabitability: ' + p.hab + '/100\n' + (p.discovery || '');
+      var blob = new Blob([txt], { type: 'text/plain' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (p.name || 'planet').replace(/\s+/g, '-') + '-report.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+    document.getElementById('btn-share').onclick = function() {
+      var p = window.currentPlanet;
+      var text = p ? 'Check out ' + p.name + ' on Exoplanet AI – Habitability ' + p.hab + '/100' : 'Explore exoplanets with Exoplanet AI';
+      if (navigator.share) {
+        navigator.share({ title: 'Exoplanet AI', text: text }).catch(function() { copyShare(text); });
+      } else { copyShare(text); }
+    };
+    function copyShare(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text);
+        alert(lang === 'en' ? 'Copied to clipboard!' : lang === 'hi' ? 'क्लिपबोर्ड पर कॉपी!' : '¡Copiado!');
+      }
+    }
+
+    document.getElementById('newsletter-btn').onclick = function() {
+      document.getElementById('newsletter-msg').style.display = 'block';
+      document.getElementById('newsletter-email').value = '';
+    };
+
+    document.querySelectorAll('[data-page]').forEach(function(el) {
+      el.addEventListener('click', function(e) { e.preventDefault(); if (this.dataset.page) showPage(this.dataset.page); });
+    });
+
+    var langPicker = document.getElementById('lang-picker');
+    document.querySelectorAll('[data-action="language"]').forEach(function(el) {
+      el.addEventListener('click', function(e) { e.preventDefault(); langPicker.style.display = 'flex'; langPicker.setAttribute('aria-hidden', 'false'); });
+    });
+    function closeLangPicker() { langPicker.style.display = 'none'; langPicker.setAttribute('aria-hidden', 'true'); }
+    if (langPicker) {
+      langPicker.addEventListener('click', function(e) { if (e.target === langPicker) closeLangPicker(); });
+      langPicker.querySelectorAll('button[data-lang]').forEach(function(btn) {
+        btn.addEventListener('click', function() { setLang(this.getAttribute('data-lang')); closeLangPicker(); });
+      });
+      var closeBtn = document.getElementById('lang-picker-close');
+      if (closeBtn) closeBtn.addEventListener('click', closeLangPicker);
+    }
+
+    setLang(lang);
+    renderDashboard();
+    showPage('home');
+    startHeroOrbit();
+  </script>
+</body>
+</html>

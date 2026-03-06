@@ -1,0 +1,12 @@
+Exoplanet AI — Your link
+========================
+
+Open in browser (when server is running):
+
+  http://127.0.0.1:8080
+
+To start the server: double-click RUN.bat in the exoplanet-ai folder,
+or run:  python -m http.server 8080 --bind 127.0.0.1
+(from inside the exoplanet-ai folder)
+
+To open without server: open index.html directly in your browser.

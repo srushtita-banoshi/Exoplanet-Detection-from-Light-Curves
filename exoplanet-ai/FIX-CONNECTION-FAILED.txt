@@ -1,0 +1,49 @@
+================================================================================
+  "Connection Failed" / "ERR_CONNECTION_REFUSED" when opening localhost:3000
+================================================================================
+
+This means the app is NOT running. You need to START it first.
+
+--------------------------------------------------------------------------------
+QUICK FIX (easiest)
+--------------------------------------------------------------------------------
+
+1. Open File Explorer.
+2. Go to the exoplanet-ai folder (Desktop -> ambedkar clg -> exoplanet-ai).
+3. Double-click:  OPEN-APP.bat
+4. A black window will open. WAIT until you see "Ready on http://localhost:3000". 
+   This can take 20-30 seconds the first time.
+5. DO NOT close that window. Keep it open.
+6. Open your browser and go to:  http://localhost:3000
+
+--------------------------------------------------------------------------------
+IF OPEN-APP.bat DOES NOT WORK
+--------------------------------------------------------------------------------
+
+Do it manually:
+
+1. Press Windows key, type:  cmd
+2. Press Enter. A black window opens.
+3. Type this (one line):
+   cd path\to\exoplanet-ai\frontend
+   (Replace with your real path, e.g.:  cd "C:\Users\Harivansh khemani\Desktop\ambedkar clg\exoplanet-ai\frontend")
+
+4. Press Enter.
+5. Type:  npm install
+   Press Enter. Wait for it to finish.
+
+6. Type:  npm run dev
+   Press Enter.
+
+7. Wait until you see "Ready on http://localhost:3000". 
+8. Open browser and go to:  http://localhost:3000
+
+--------------------------------------------------------------------------------
+IMPORTANT
+--------------------------------------------------------------------------------
+
+- The black window (cmd) MUST stay open. If you close it, the app stops.
+- localhost:3000 only works when the app is running.
+- If you see "npm not found", install Node.js from https://nodejs.org/
+
+================================================================================

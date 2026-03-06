@@ -1,0 +1,13 @@
+Synthetic holdout performance (offline training):
+                              precision    recall  f1-score   support
+
+          No planet detected      0.906     1.000     0.951        58
+Possible exoplanet candidate      0.833     0.500     0.625        10
+  High probability exoplanet      1.000     0.968     0.984        62
+
+                    accuracy                          0.946       130
+                   macro avg      0.913     0.823     0.853       130
+                weighted avg      0.945     0.946     0.941       130
+
+
+Note: This is trained on synthetic transit/no-transit signals for offline demo.

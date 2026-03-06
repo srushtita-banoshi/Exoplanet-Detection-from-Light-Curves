@@ -1,0 +1,55 @@
+========================================
+  HOW TO OPEN EXOPLANET AI (STEP BY STEP)
+========================================
+
+You have TWO easy ways. Use whichever you like.
+
+----------------------------------------
+  WAY 1 — EASIEST (no server, just open the file)
+----------------------------------------
+
+Step 1: Open "File Explorer" (the folder icon on your taskbar, or press Windows key + E).
+
+Step 2: Go to your Desktop.
+        → Click "Desktop" in the left side of the window.
+
+Step 3: Open the folder "ambedkar clg".
+        → Double-click the folder named "ambedkar clg".
+
+Step 4: Open the folder "exoplanet-ai".
+        → Double-click the folder named "exoplanet-ai".
+
+Step 5: Find the file "index.html".
+        → It has a browser icon (Chrome/Edge icon).
+
+Step 6: Double-click "index.html".
+        → Your browser will open and the website will show. Done!
+
+----------------------------------------
+  WAY 2 — Using RUN.bat (starts a small server, then opens the site)
+----------------------------------------
+
+Step 1: Open File Explorer (folder icon on taskbar or Windows key + E).
+
+Step 2: Go to: Desktop → "ambedkar clg" → "exoplanet-ai".
+        (Same as Steps 2–4 in Way 1.)
+
+Step 3: Find the file "RUN.bat".
+        → It might show as "RUN" with a gear/batch icon.
+
+Step 4: Double-click "RUN.bat".
+        → A black window will appear (that’s the server). Don’t close it.
+
+Step 5: Your browser will open by itself in a few seconds with the website.
+        → If it doesn’t, open Chrome or Edge and type in the address bar:  http://127.0.0.1:8080  then press Enter.
+
+Step 6: When you’re done, you can close the black window to stop the server.
+
+----------------------------------------
+  QUICK REMINDER
+----------------------------------------
+
+• Way 1 = Double-click "index.html" inside "exoplanet-ai". No server needed.
+• Way 2 = Double-click "RUN.bat" inside "exoplanet-ai". A window stays open; the site opens in the browser.
+
+If anything doesn’t open, tell me what you see (e.g. “I don’t see exoplanet-ai” or “Double-click does nothing”) and we’ll fix it.

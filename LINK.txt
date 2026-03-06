@@ -1,0 +1,7 @@
+Exoplanet AI — Your link
+========================
+
+  http://127.0.0.1:8080
+
+Start server: open exoplanet-ai folder and double-click RUN.bat
+Or open exoplanet-ai/index.html directly in browser (no server needed).
