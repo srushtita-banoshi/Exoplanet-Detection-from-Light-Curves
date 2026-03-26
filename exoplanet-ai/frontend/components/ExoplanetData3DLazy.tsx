@@ -7,7 +7,7 @@ const ExoplanetData3D = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[280px] rounded-xl bg-slate-900/50 border border-white/10 flex items-center justify-center">
+      <div className="w-full h-[320px] rounded-xl bg-slate-900/50 border border-white/10 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-cyan-400/50 border-t-cyan-400 rounded-full animate-spin" />
       </div>
     ),

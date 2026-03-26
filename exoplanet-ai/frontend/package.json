@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:safe": "set NODE_OPTIONS=--max-old-space-size=4096&& next dev",
     "build": "next build",
+    "build:safe": "set NODE_OPTIONS=--max-old-space-size=4096&& next build",
     "start": "next start",
     "lint": "next lint"
   },

@@ -71,10 +71,18 @@ export default function DashboardPage() {
                 {s === 'hab' ? 'Habitability' : s === 'period' ? 'Period' : 'Radius'}
               </button>
             ))}
-            <Link href="/compare" className="ml-2">
+            <Link href="/explorer" className="ml-1">
               <motion.span
                 className="inline-block px-3 py-1.5 rounded-lg border border-cyan-400/40 text-cyan-400 text-xs font-medium"
                 whileHover={{ backgroundColor: 'rgba(34, 211, 238, 0.1)' }}
+              >
+                3D Explorer
+              </motion.span>
+            </Link>
+            <Link href="/compare" className="ml-1">
+              <motion.span
+                className="inline-block px-3 py-1.5 rounded-lg border border-white/10 text-slate-400 text-xs font-medium hover:border-cyan-400/30"
+                whileHover={{ backgroundColor: 'rgba(34, 211, 238, 0.05)' }}
               >
                 Compare →
               </motion.span>
@@ -117,7 +125,7 @@ export default function DashboardPage() {
             >
               <h3 className="text-cyan-400 font-semibold text-sm mb-2">3D dataset visualization</h3>
               <p className="text-slate-500 text-xs mb-4">
-                Planets vs star reference. Sphere size ∝ radius. Period (X), Radius (Y), Habitability (Z). Drag to rotate.
+                Parameter space: sphere size ∝ radius. Period (X), Radius (Y), Habitability (Z). Drag to rotate.
               </p>
               <ExoplanetData3D />
             </motion.div>

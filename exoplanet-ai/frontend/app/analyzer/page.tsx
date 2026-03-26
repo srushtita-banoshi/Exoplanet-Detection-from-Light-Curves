@@ -9,6 +9,121 @@ import { fireConfetti } from '@/components/Confetti';
 
 type Point = { time: number; flux: number };
 
+/** Client-side demo detection: fully data-driven from this light curve. */
+function runDemoDetection(time: number[], flux: number[]): {
+  probability: number;
+  period: number;
+  explanation: string;
+  habitability_score: number;
+  radius_earth: number;
+} {
+  const n = flux.length;
+  if (n < 10) return { probability: 0, period: 0, explanation: 'Not enough data.', habitability_score: 0, radius_earth: 1 };
+  const meanFlux = flux.reduce((a, b) => a + b, 0) / n;
+  const minFlux = Math.min(...flux);
+  const maxFlux = Math.max(...flux);
+  const depth = maxFlux > minFlux ? (maxFlux - minFlux) / maxFlux : 0;
+  const std = Math.sqrt(flux.reduce((s, f) => s + (f - meanFlux) ** 2, 0) / n) || 0.001;
+  const threshold = meanFlux - 0.5 * std;
+
+  const dipIndices: number[] = [];
+  for (let i = 1; i < n - 1; i++) {
+    const f = flux[i]!;
+    if (f <= (flux[i - 1] ?? 1) && f <= (flux[i + 1] ?? 1) && f < meanFlux) {
+      dipIndices.push(i);
+    }
+  }
+  if (dipIndices.length === 0) {
+    for (let i = 0; i < n; i++) {
+      if (flux[i]! < threshold) dipIndices.push(i);
+    }
+  }
+  const dipTimes = dipIndices.map((i) => time[i] ?? 0).filter((t) => t >= 0);
+  const uniqueDips: number[] = [];
+  let last = -1e9;
+  for (const t of dipTimes) {
+    if (t - last > (time[n - 1]! - time[0]!) / (n || 1) * 3) {
+      uniqueDips.push(t);
+      last = t;
+    }
+  }
+  const dipCount = uniqueDips.length;
+
+  let period = 0;
+  if (uniqueDips.length >= 2) {
+    const intervals: number[] = [];
+    for (let j = 1; j < uniqueDips.length; j++) {
+      const dt = uniqueDips[j]! - uniqueDips[j - 1]!;
+      if (dt > 0) intervals.push(dt);
+    }
+    if (intervals.length > 0) {
+      intervals.sort((a, b) => a - b);
+      period = intervals[Math.floor(intervals.length / 2)] ?? 0;
+      const intervalStd = Math.sqrt(intervals.reduce((s, d) => s + (d - period) ** 2, 0) / intervals.length) || 0;
+      if (intervalStd > period * 0.5 && intervals.length >= 2) {
+        const short = intervals.filter((d) => d < period * 1.5);
+        if (short.length > 0) period = short[Math.floor(short.length / 2)] ?? period;
+      }
+    }
+  }
+  if (period <= 0 && n >= 20) {
+    const tSpan = time[n - 1]! - time[0]!;
+    let bestCorr = -1e9;
+    const step = tSpan / 50;
+    for (let p = step; p <= tSpan / 2; p += step) {
+      let corr = 0;
+      let count = 0;
+      for (let i = 0; i < n; i++) {
+        const ti = time[i]!;
+        const j = time.findIndex((t) => Math.abs(t - (ti + p)) < (time[1]! - time[0]!) * 0.5);
+        if (j >= 0 && j < n) {
+          corr += (flux[i]! - meanFlux) * (flux[j]! - meanFlux);
+          count++;
+        }
+      }
+          if (count > 5 && corr > bestCorr) {
+        bestCorr = corr;
+        period = p;
+      }
+    }
+  }
+  if (period <= 0 && time.length >= 2) {
+    const tSpan = time[n - 1]! - time[0]!;
+    period = tSpan / Math.max(1, dipCount || 1);
+  }
+
+  const regularity = (() => {
+    if (uniqueDips.length < 2) return 0;
+    const intervals: number[] = [];
+    for (let j = 1; j < uniqueDips.length; j++) intervals.push(uniqueDips[j]! - uniqueDips[j - 1]!);
+    const med = intervals.sort((a, b) => a - b)[Math.floor(intervals.length / 2)] ?? 0;
+    const dev = Math.sqrt(intervals.reduce((s, d) => s + (d - med) ** 2, 0) / intervals.length) || 0;
+    return med > 0 ? Math.max(0, 1 - dev / med) : 0;
+  })();
+  const depthNorm = Math.min(1, depth / 0.03);
+  // More dips → higher probability; fewer dips → lower probability (main driver)
+  const dipFactor = Math.min(1, dipCount / 10);
+  let probability = 0.12 + 0.52 * dipFactor + 0.2 * depthNorm + 0.1 * regularity + (period > 0 ? 0.06 : 0);
+  probability = Math.min(0.96, Math.max(0.12, probability));
+  if (dipCount <= 1) probability = Math.min(probability, 0.42);
+  else if (dipCount >= 6) probability = Math.max(probability, 0.65);
+
+  const radius_earth = Math.max(0.5, Math.min(3, 0.5 + 6 * Math.sqrt(Math.max(0, depth))));
+  const aAu = period > 0 ? (period * period / (365.25 * 365.25)) ** (1 / 3) : 0;
+  const inZone = aAu >= 0.95 && aAu <= 1.37;
+  const distScore = inZone ? 100 * Math.max(0, 1 - Math.abs(aAu - 1.16) / 0.4) : 30;
+  const sizeScore = 100 * Math.max(0, 1 - 0.4 * Math.abs(radius_earth - 1.1));
+  const habScore = Math.round(0.55 * distScore + 0.45 * sizeScore);
+  const explanation = 'Demo mode: detection and period estimated from this light curve (backend offline). Start FastAPI on port 8000 for full ML pipeline.';
+  return {
+    probability,
+    period,
+    explanation,
+    habitability_score: Math.min(100, Math.max(0, habScore)),
+    radius_earth,
+  };
+}
+
 export default function AnalyzerPage() {
   const [time, setTime] = useState<number[]>([]);
   const [flux, setFlux] = useState<number[]>([]);
@@ -21,20 +136,10 @@ export default function AnalyzerPage() {
     transit_dips?: [number, number][];
   } | null>(null);
   const [periodEst, setPeriodEst] = useState<{ period?: number } | null>(null);
-  const [habResult, setHabResult] = useState<{ habitabilty_score?: number } | null>(null);
+  const [habResult, setHabResult] = useState<{ habitabilty_score?: number; radius_earth?: number } | null>(null);
   const [progress, setProgress] = useState(0);
 
   const chartData: Point[] = time.map((t, i) => ({ time: t, flux: flux[i] ?? 0 })).filter((d) => d.flux !== undefined);
-
-  const downloadSample = () => {
-    const csv = 'time,flux\n0,1\n0.5,0.999\n1,0.998\n1.5,0.992\n2,0.99\n2.5,0.992\n3,0.998\n3.5,1\n4,1\n4.5,0.999\n5,0.998\n5.5,0.991\n6,0.99\n6.5,0.991\n7,0.998\n7.5,1\n8,1';
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'sample_lightcurve.csv';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setFileError('');
@@ -93,21 +198,48 @@ export default function AnalyzerPage() {
         fetch(`${base}/api/estimate-period`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ time, flux }) }),
       ]);
       advance();
-      const pred = await predRes.json();
-      const period = await periodRes.json();
+      const pred = await predRes.json().catch(() => ({}));
+      const period = await periodRes.json().catch(() => ({}));
       advance();
-      setResult(pred);
-      setPeriodEst(period);
-      if (period?.period) {
-        const habRes = await fetch(`${base}/api/habitabilty-score`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ period_days: period.period, planet_radius_earth: 1.2 }) });
-        const hab = await habRes.json();
-        setHabResult(hab);
+      const backendOk = predRes.ok && periodRes.ok && (pred.probability != null || period.period != null);
+      if (backendOk) {
+        setResult({ ...pred, period_used: pred.period_used ?? period.period });
+        setPeriodEst(period);
+        if (period?.period) {
+          try {
+            const habRes = await fetch(`${base}/api/habitabilty-score`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ period_days: period.period, planet_radius_earth: 1.2 }) });
+            if (habRes.ok) {
+              const hab = await habRes.json();
+              setHabResult(hab);
+            }
+          } catch {
+            setHabResult({ habitabilty_score: Math.min(100, Math.round(50 + period.period * 0.05)) });
+          }
+        }
+        if ((pred.probability ?? 0) > 0.5) fireConfetti();
+      } else {
+        const demo = runDemoDetection(time, flux);
+        setResult({
+          probability: demo.probability,
+          period_used: demo.period,
+          explanation: demo.explanation,
+        });
+        setPeriodEst({ period: demo.period });
+        setHabResult({ habitabilty_score: demo.habitability_score, radius_earth: demo.radius_earth });
+        if (demo.probability > 0.5) fireConfetti();
       }
       advance();
       setProgress(1);
-      if ((pred.probability ?? 0) > 0.5) fireConfetti();
     } catch (e) {
-      setResult({ explanation: 'Backend unavailable. Start FastAPI (port 8000) and try again.' });
+      const demo = runDemoDetection(time, flux);
+      setResult({
+        probability: demo.probability,
+        period_used: demo.period,
+        explanation: demo.explanation,
+      });
+      setPeriodEst({ period: demo.period });
+      setHabResult({ habitabilty_score: demo.habitability_score, radius_earth: demo.radius_earth });
+      if (demo.probability > 0.5) fireConfetti();
     } finally {
       setPredicting(false);
       setProgress(0);
@@ -159,13 +291,6 @@ export default function AnalyzerPage() {
               'Detect exoplanet'
             )}
           </motion.button>
-          <motion.button
-            onClick={downloadSample}
-            className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm"
-            whileHover={{ borderColor: 'rgba(34, 211, 238, 0.5)' }}
-          >
-            Download sample CSV
-          </motion.button>
         </motion.div>
 
         {predicting && (
@@ -206,12 +331,12 @@ export default function AnalyzerPage() {
                   >
                     <h3 className="text-cyan-400 font-semibold mb-4">Detection result</h3>
                     <div className="space-y-2 text-slate-300">
-                      <p>Probability: <span className="text-cyan-400 font-medium">{(result.probability ?? 0) * 100}%</span></p>
-                      <p>Period: <span className="text-cyan-400 font-medium">{result.period_used?.toFixed(2) ?? periodEst?.period?.toFixed(2) ?? '—'} d</span></p>
+                      <p>Probability: <span className="text-cyan-400 font-medium">{Math.round((result.probability ?? 0) * 100)}%</span></p>
+                      <p>Period: <span className="text-cyan-400 font-medium">{(result.period_used ?? periodEst?.period) != null ? Number(result.period_used ?? periodEst?.period).toFixed(2) : '—'} d</span></p>
                     </div>
-                    {habResult?.habitabilty_score != null && periodEst?.period && (
+                    {habResult?.habitabilty_score != null && periodEst?.period != null && (
                       <div className="mt-6">
-                        <HabitabilityDetail score={habResult.habitabilty_score} periodDays={periodEst.period} radiusEarth={1.2} name="Detected candidate" />
+                        <HabitabilityDetail score={habResult.habitabilty_score} periodDays={periodEst.period} radiusEarth={habResult.radius_earth ?? 1.2} name="Detected candidate" />
                       </div>
                     )}
                     <p className="text-slate-400 mt-4 text-sm leading-relaxed">{result.explanation}</p>

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { SpaceScene3D } from '@/components/SpaceScene3DLazy';
 import { ExoplanetData3D } from '@/components/ExoplanetData3DLazy';
-import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { Tooltip } from '@/components/Tooltip';
 
 export default function HomePage() {
@@ -61,20 +60,15 @@ export default function HomePage() {
                   Compare Planets
                 </motion.span>
               </Link>
-            </div>
-            <div className="flex gap-8">
-              <div>
-                <div className="text-xl font-bold text-cyan-400"><AnimatedCounter end={5500} suffix="+" /></div>
-                <div className="text-slate-500 text-xs">Exoplanets</div>
-              </div>
-              <div>
-                <div className="text-xl font-bold text-cyan-400"><AnimatedCounter end={95} suffix="%" /></div>
-                <div className="text-slate-500 text-xs">Detection AUC</div>
-              </div>
-              <div>
-                <div className="text-xl font-bold text-cyan-400"><AnimatedCounter end={3} /></div>
-                <div className="text-slate-500 text-xs">Languages</div>
-              </div>
+              <Link href="/explorer">
+                <motion.span
+                  className="inline-block px-6 py-3 rounded-xl font-medium text-slate-400 border border-white/10 hover:border-cyan-400/30 hover:text-cyan-400 transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  3D Explorer
+                </motion.span>
+              </Link>
             </div>
           </motion.div>
           <motion.div
@@ -152,7 +146,7 @@ export default function HomePage() {
         >
           <h2 className="text-cyan-400 font-semibold mb-2">3D dataset visualization</h2>
           <p className="text-slate-500 text-sm mb-4">
-            Planets vs star reference. Sphere size ∝ planet radius. Period (X), Radius (Y), Habitability (Z). Drag to rotate.
+            Parameter space: sphere size ∝ planet radius. Period (X), Radius (Y), Habitability (Z). Drag to rotate.
           </p>
           <ExoplanetData3D />
         </motion.section>

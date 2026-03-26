@@ -2,13 +2,15 @@
 
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 const ID_ALIASES: Record<string, string> = {
   'kepler-22b': 'k22b', 'trappist-1e': 't1e', 'toi-700-d': 'toi700',
   'kepler-186f': 'k186f', 'kepler-452b': 'k452b',
 };
+
+const PLANET_COLORS = ['#22d3ee', '#22c55e', '#eab308', '#a78bfa', '#f472b6'] as const;
 
 type Planet = {
   id: string;
@@ -31,22 +33,9 @@ function normalize(val: number, min: number, max: number): number {
   return (val - min) / (max - min || 1);
 }
 
-function StarReference() {
-  const ref = useRef<THREE.Mesh>(null);
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.y = state.clock.elapsedTime * 0.2;
-    }
-  });
-  return (
-    <group position={[-2.5, -2.5, -2.5]}>
-      <mesh ref={ref}>
-        <sphereGeometry args={[0.25, 24, 24]} />
-        <meshBasicMaterial color="#fbbf24" />
-      </mesh>
-      <pointLight color="#fbbf24" intensity={2} distance={6} />
-    </group>
-  );
+function semiMajorAxisAu(periodDays: number): string {
+  const a = (periodDays * periodDays / (365.25 * 365.25)) ** (1 / 3);
+  return a.toFixed(2);
 }
 
 function DataPoint({
@@ -63,22 +52,45 @@ function DataPoint({
   sizeScale: number;
 }) {
   const ref = useRef<THREE.Mesh>(null);
-  const baseSize = 0.06 * sizeScale;
+  const baseSize = 0.14 * Math.min(sizeScale, 2);
   useFrame((state) => {
     if (ref.current && isHighlighted) {
-      ref.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 2) * 0.2);
+      ref.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 2) * 0.15);
     }
   });
+  const au = semiMajorAxisAu(planet.period_days);
   return (
     <group position={position}>
       <mesh ref={ref}>
-        <sphereGeometry args={[isHighlighted ? baseSize * 1.5 : baseSize, 20, 20]} />
+        <sphereGeometry args={[baseSize, 24, 24]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={isHighlighted ? 0.7 : 0.4}
+          emissiveIntensity={isHighlighted ? 0.7 : 0.5}
         />
       </mesh>
+      <Html
+        position={[0, baseSize + 0.35, 0]}
+        center
+        distanceFactor={8}
+        style={{
+          pointerEvents: 'none',
+          userSelect: 'none',
+          whiteSpace: 'nowrap',
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: '10px',
+          color: '#e2e8f0',
+          background: 'rgba(3, 7, 18, 0.9)',
+          padding: '4px 8px',
+          borderRadius: '6px',
+          border: `1px solid ${color}60`,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ fontWeight: 600, color }}>{planet.name}</div>
+        <div style={{ color: '#94a3b8', fontSize: '9px', marginTop: '2px' }}>{au} AU · {planet.habitabilty_score}/100</div>
+      </Html>
     </group>
   );
 }
@@ -93,12 +105,11 @@ function Scene({ highlightId }: { highlightId?: string }) {
 
   const points = useMemo(
     () =>
-      DEMO_PLANETS.map((p) => {
+      DEMO_PLANETS.map((p, i) => {
         const x = (normalize(p.period_days, minP, maxP) - 0.5) * 4;
         const y = (normalize(p.radius_earth, minR, maxR) - 0.5) * 4;
         const z = (p.habitabilty_score / 100 - 0.5) * 4;
-        const color =
-          p.habitabilty_score >= 70 ? '#22c55e' : p.habitabilty_score >= 40 ? '#eab308' : '#64748b';
+        const color = PLANET_COLORS[i % PLANET_COLORS.length];
         const sizeScale = p.radius_earth;
         return { planet: p, position: [x, z, y] as [number, number, number], color, sizeScale };
       }),
@@ -107,10 +118,9 @@ function Scene({ highlightId }: { highlightId?: string }) {
 
   return (
     <>
-      <ambientLight intensity={0.35} />
-      <pointLight position={[5, 5, 5]} intensity={1} />
-      <pointLight position={[-5, -5, 5]} intensity={0.5} />
-      <StarReference />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[6, 6, 6]} intensity={1.2} />
+      <pointLight position={[-6, -6, 4]} intensity={0.6} />
       {points.map(({ planet, position, color, sizeScale }) => (
         <DataPoint
           key={planet.id}
@@ -124,10 +134,10 @@ function Scene({ highlightId }: { highlightId?: string }) {
       <OrbitControls
         enableZoom={true}
         enablePan={true}
-        minDistance={3}
-        maxDistance={12}
+        minDistance={4}
+        maxDistance={14}
         autoRotate
-        autoRotateSpeed={0.5}
+        autoRotateSpeed={0.4}
       />
     </>
   );
@@ -142,18 +152,18 @@ export function ExoplanetData3D({
 }) {
   const resolvedId = highlightId ? (ID_ALIASES[highlightId] ?? highlightId) : undefined;
   return (
-    <div className={`relative w-full h-[280px] rounded-xl overflow-hidden border border-white/10 ${className}`}>
-      <Canvas camera={{ position: [5, 4, 5], fov: 50 }} gl={{ antialias: true, alpha: true }}>
+    <div className={`relative w-full h-[320px] rounded-xl overflow-hidden border border-white/10 ${className}`}>
+      <Canvas camera={{ position: [6, 5, 6], fov: 50 }} gl={{ antialias: true, alpha: true }}>
         <color attach="background" args={['#030712']} />
         <Scene highlightId={resolvedId} />
       </Canvas>
       <div className="absolute bottom-2 left-2 right-2 flex justify-between text-[10px] text-slate-500 px-2 pointer-events-none">
-        <span>X: Period</span>
-        <span>Y: Radius</span>
+        <span>X: Period (d)</span>
+        <span>Y: Radius (R⊕)</span>
         <span>Z: Habitability</span>
       </div>
-      <div className="absolute top-2 left-2 text-[10px] text-amber-400/80 pointer-events-none">
-        ★ Star reference
+      <div className="absolute top-2 left-2 text-[10px] text-slate-500 pointer-events-none">
+        Each sphere = one planet · Label shows name, distance (AU), habitability
       </div>
     </div>
   );

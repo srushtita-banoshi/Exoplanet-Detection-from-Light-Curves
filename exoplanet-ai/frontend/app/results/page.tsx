@@ -1,10 +1,11 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { HabitabilityDetail } from '@/components/HabitabilityDetail';
+import { AIVerdict } from '@/components/AIVerdict';
 import { LightCurveChart } from '@/components/LightCurveChart';
 import { PlanetView3D } from '@/components/PlanetView3DLazy';
 import { ExoplanetData3D } from '@/components/ExoplanetData3DLazy';
@@ -38,20 +39,34 @@ function ResultsContent() {
     return () => window.removeEventListener('keydown', onKey);
   }, [router]);
 
-  const [chartData] = useState(() => {
-    const t: number[] = [];
-    const f: number[] = [];
-    const n = 120;
+  const chartData = useMemo(() => {
+    const transitDepth = 0.012 * radius * radius;
+    const numTransits = period > 200 ? 2 : period > 80 ? 3 : 4;
+    const timeSpan = Math.min(period * numTransits, 600);
+    const n = 200;
+    const points: { time: number; flux: number }[] = [];
+    let seed = (period * 1000 + radius * 10) | 0;
+    const noise = () => {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return (seed / 0x7fffffff - 0.5) * 0.0012;
+    };
     for (let i = 0; i < n; i++) {
-      const ti = (i / (n - 1)) * period * 4;
-      const phase = (ti % period) / period;
-      const inDip = phase >= 0.48 && phase <= 0.52;
-      const flux = inDip ? 1 - 0.01 * radius : 1 + (Math.random() - 0.5) * 0.002;
-      t.push(ti);
-      f.push(flux);
+      const ti = (i / (n - 1)) * timeSpan;
+      const phase = period > 0 ? (ti % period) / period : 0;
+      const transitWidth = 0.055;
+      const ingress = 0.5 - transitWidth / 2;
+      const egress = 0.5 + transitWidth / 2;
+      let dip = 0;
+      if (phase >= ingress && phase <= egress) {
+        if (phase <= 0.5 - 0.01) dip = Math.min(1, (phase - ingress) / 0.01);
+        else if (phase >= 0.5 + 0.01) dip = Math.min(1, (egress - phase) / 0.01);
+        else dip = 1;
+      }
+      const flux = 1 - transitDepth * dip + noise();
+      points.push({ time: Number(ti.toFixed(2)), flux: Number(flux.toFixed(5)) });
     }
-    return t.map((time, i) => ({ time, flux: f[i]! }));
-  });
+    return points;
+  }, [period, radius]);
 
   const habColor = hab >= 70 ? 'text-green-400' : hab >= 40 ? 'text-amber-400' : 'text-rose-400';
 
@@ -185,9 +200,22 @@ function ResultsContent() {
             >
               <h3 className="text-cyan-400 font-semibold text-sm mb-2">3D dataset visualization</h3>
               <p className="text-slate-500 text-xs mb-3">
-                Planets vs star reference. Sphere size ∝ radius. X: Period, Y: Radius, Z: Habitability.
+                Parameter space: sphere size ∝ planet radius. X: Period, Y: Radius, Z: Habitability.
               </p>
               <ExoplanetData3D highlightId={id} />
+            </motion.div>
+
+            <motion.div
+              className="rounded-xl overflow-hidden border border-white/10 bg-white/[0.02] p-4"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28 }}
+            >
+              <h3 className="text-cyan-400 font-semibold text-sm mb-1">Simulated light curve</h3>
+              <p className="text-slate-500 text-xs mb-3">
+                Each dip = transit (planet in front of star). Depth ∝ radius²; spacing ∝ period — unique per planet.
+              </p>
+              <LightCurveChart data={chartData} />
             </motion.div>
           </div>
 
@@ -201,13 +229,16 @@ function ResultsContent() {
               <HabitabilityDetail score={hab} periodDays={period} radiusEarth={radius} name={name} />
             </motion.div>
             <motion.div
-              className="rounded-xl overflow-hidden border border-white/10 bg-white/[0.02] p-4"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
+              transition={{ delay: 0.22 }}
             >
-              <h3 className="text-cyan-400 font-semibold text-sm mb-3">Simulated light curve</h3>
-              <LightCurveChart data={chartData} />
+              <AIVerdict
+                planetName={name}
+                radiusEarth={radius}
+                periodDays={period}
+                habitabilityScore={hab}
+              />
             </motion.div>
 
             <motion.div
